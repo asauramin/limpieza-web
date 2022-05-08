@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block head %}
+    <title>Limpieza</title>
+{% endblock%}
+
+{% block body %}
+<h1>Limpieza de usuarios en Twitter</h1>
+<div class="botones">
+    <form action="/comenzar" method="post">
+        {% if autenticado %}
+            <input type="submit" value="Comenzar">
+        {% else %}
+            <input type="submit" value="Comenzar" disabled="True">
+        {% endif %}
+    </form>
+    <form action="/autenticar" method="get">
+        <input type="submit" value="Autenticar">
+    </form>
+</div>
+{% endblock%}
+

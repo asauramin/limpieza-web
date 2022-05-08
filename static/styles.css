@@ -1,0 +1,18 @@
+body {
+    text-align: center;
+}
+
+.estado2 {
+    text-align: right;
+    color: darkred;
+}
+
+.estado1 {
+    text-align: right;
+    color: darkgreen;
+}
+.oauth_url {
+    font-size: x-small;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: lighter;
+}

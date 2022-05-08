@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block head %}
+    <title>Autenticación</title>
+{% endblock%}
+
+{% block body %}
+    <h1>Copia la siguiente URL en otra ventanta del navegador para dar permiso a la aplicación</h1>
+    <div class="oauth_url">
+        {{ auth_url }}
+    </div>
+    <form action="/autenticar" method="post">
+        <input type="text" autocomplete="off" autofocus name="url">
+        <input type="submit" name="autenticar" value="Enviar">
+    </form>
+{% endblock%}
