@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from datetime import datetime, timezone, timedelta
-import json
 from google.cloud import firestore
 from google.cloud import secretmanager
 from datetime import datetime, timezone, timedelta
@@ -9,7 +8,6 @@ import google_crc32c
 import base64
 import hashlib
 import re
-import urllib
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
 import aux_limpieza
@@ -20,27 +18,6 @@ app = Flask(__name__)
 oauth_record={}
 
 TW_USER_ID=os.environ['TW_USER_ID']
-
-def get_project_id():
-    
-    url = "http://metadata.google.internal/computeMetadata/v1/project/project-id"
-    req = urllib.request.Request(url)
-    req.add_header("Metadata-Flavor", "Google")
-
-    try:
-        project_id = urllib.request.urlopen(req).read().decode()
-
-    except Exception:
-        # Exception means this is running locally so GOOGLE_APPLICATION_CREDENTIALS should be defined
-        if 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
-            with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
-                credentials = json.load(fp)
-            project_id = credentials['project_id']
-            return project_id
-        else:
-            return ""
-    
-    return project_id
 
 def set_secret(client, proj_id, secret_id, payload):
     parent = client.secret_path(proj_id, secret_id)
@@ -110,12 +87,13 @@ def valid_token_cache():
 def valid_token_db(my_user_id):
     global oauth_record
 
-    db = firestore.Client("twitter-redirect")
+    project_id = aux_limpieza.get_project_id()
+    db = firestore.Client(project_id)
     doc_ref = db.collection("oauth").document(my_user_id)
     local_oauth_record = doc_ref.get().to_dict()
 
     secretClient = secretmanager.SecretManagerServiceClient()
-    project_id = get_project_id()
+
     if project_id == "":
         raise Exception("Failed to determine GCP Project ID")
 
@@ -192,14 +170,14 @@ def generar_tokens_oauth(authorization_response):
 
 # Objetivo - sincronizar el registro oauth (espero que después de haber realizado el flujo oauth adecuadamente) con la base de datos y el secret manager
 def flush_oauth_record(my_user_id):
-    db = firestore.Client("twitter-redirect")
+    db = firestore.Client(aux_limpieza.get_project_id())
     doc_ref = db.collection("oauth").document(my_user_id)
 
     doc_ref.update({"token_timestamp" : firestore.SERVER_TIMESTAMP})
     oauth_record["token_timestamp"] = doc_ref.get().to_dict()["token_timestamp"]
 
     secretClient = secretmanager.SecretManagerServiceClient()
-    project_id = get_project_id()
+    project_id = aux_limpieza.get_project_id()
 
     set_secret(client=secretClient,proj_id=project_id,secret_id="access",payload=oauth_record["access"])
 
@@ -261,3 +239,7 @@ def limpieza():
             rate_limit -= 1
 
     return (unfollowed)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

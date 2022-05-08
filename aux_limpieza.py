@@ -1,8 +1,33 @@
 from google.cloud import firestore
 import requests
+import urllib
+import os
+import json
+
+
+def get_project_id():
+    
+    url = "http://metadata.google.internal/computeMetadata/v1/project/project-id"
+    req = urllib.request.Request(url)
+    req.add_header("Metadata-Flavor", "Google")
+
+    try:
+        project_id = urllib.request.urlopen(req).read().decode()
+
+    except Exception:
+        # Exception means this is running locally so GOOGLE_APPLICATION_CREDENTIALS should be defined
+        if 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
+            with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
+                credentials = json.load(fp)
+            project_id = credentials['project_id']
+            return project_id
+        else:
+            return ""
+    
+    return project_id
 
 def get_vip_list(my_user_id):
-    db = firestore.Client("twitter-redirect")
+    db = firestore.Client(get_project_id())
     doc_ref = db.collection("state").document(my_user_id)
     data = doc_ref.get().to_dict()
     return data["vip_list"]
