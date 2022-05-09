@@ -3,3 +3,4 @@ env/*
 env_vars.sh
 twitter*.json
 .DS_Store
+.gitignore

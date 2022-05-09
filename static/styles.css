@@ -1,5 +1,8 @@
 body {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 }
 
 .estado2 {
