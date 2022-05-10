@@ -6,12 +6,11 @@
 {% block body %}
 <h1>Limpieza terminada</h1>
 <h2>Redirigiendo a la página principal en <span class="secundero">5</span> segundos</h2>
-<h2>Se ha eliminado a {{ eliminados|length }} usuarios:</h2>
-<ul>
-    {% for eliminado in eliminados %}
-    <li>eliminado</li>
-    {% endfor %}       
-</ul>
+<h2>Se han eliminado {{ eliminados|length }} usuarios:</h2>
+
+{% for eliminado in eliminados %}
+<h3>{{eliminado}}</h3>
+{% endfor %}       
 <script>
     function sleep(ms){
         return new Promise(resolve => setTimeout(resolve,ms));
