@@ -204,9 +204,10 @@ def autenticar():
             oauth_url = generar_url_oauth()
             return render_template("autenticar.html", auth_url=oauth_url, autenticado=False)
     if request.method == "POST":
-        url = request.form.get('url')
+        secretClient = secretmanager.SecretManagerServiceClient()
         try:
-            generar_tokens_oauth(url)
+            redirect_url = get_secret(client=secretClient,project_id=aux_limpieza.get_project_id(),secret="last_redirect_url")
+            generar_tokens_oauth(redirect_url)
             flush_oauth_record(my_user_id=TW_USER_ID)
         except Exception:
             return render_template("hubo_algun_problema.html", autenticado=False)
@@ -243,7 +244,12 @@ def limpieza():
 
 @app.route("/redirect")
 def redirect():
-    return "Amparo"
+
+    secretClient = secretmanager.SecretManagerServiceClient()
+    project_id=aux_limpieza.get_project_id()
+    set_secret(client=secretClient,proj_id=project_id,secret_id="last_redirect_url",payload=request.url)
+
+    return "Autorizado con URL {}".format(request.url)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
