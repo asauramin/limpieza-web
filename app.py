@@ -43,6 +43,13 @@ def set_secret(client, proj_id, secret_id, payload):
                 "secret": {"replication": {"user_managed": {"replicas": [{"location": "europe-west1"}]}}},
             }
         )
+        #Y ahora sí, lo actualizo
+        client.add_secret_version(
+            request={
+                "parent": parent,
+                "payload": {"data": payload}
+            }
+        )
 
     return
 
@@ -206,10 +213,11 @@ def autenticar():
     if request.method == "POST":
         secretClient = secretmanager.SecretManagerServiceClient()
         try:
-            redirect_url = get_secret(client=secretClient,project_id=aux_limpieza.get_project_id(),secret="last_redirect_url")
+            redirect_url = get_secret(client=secretClient,proj_id=aux_limpieza.get_project_id(),secret="last_redirect_url")
             generar_tokens_oauth(redirect_url)
             flush_oauth_record(my_user_id=TW_USER_ID)
-        except Exception:
+        except Exception as exc:
+            print(exc)
             return render_template("hubo_algun_problema.html", autenticado=False)
         
         return render_template("autenticacion_completa.html", autenticado=True)
@@ -247,7 +255,9 @@ def redirect():
 
     secretClient = secretmanager.SecretManagerServiceClient()
     project_id=aux_limpieza.get_project_id()
-    set_secret(client=secretClient,proj_id=project_id,secret_id="last_redirect_url",payload=request.url)
+    redirect_url = 'https' + request.url.split('http')[-1]
+
+    set_secret(client=secretClient,proj_id=project_id,secret_id="last_redirect_url",payload=redirect_url)
 
     return "Autorizado con URL {}".format(request.url)
 
