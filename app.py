@@ -241,5 +241,9 @@ def limpieza():
     return (unfollowed)
 
 
+@app.route("/redirect")
+def redirect():
+    return "Amparo"
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
