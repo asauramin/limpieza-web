@@ -6,7 +6,7 @@
 {% block body %}
     <h1>Abre la siguiente URL en otra ventanta del navegador para dar permiso a la aplicación</h1>
     <div class="oauth_url">
-        <a href={{ auth_url }}>Autenticar en Twitter</a>
+        <a href={{ auth_url }} target="_blank">Autenticar en Twitter</a>
     </div>
     <form action="/autenticar" method="post">
         <input type="submit" name="autenticar" value="Completar Autenticación">
