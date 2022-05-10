@@ -68,6 +68,17 @@ def get_secret(client, proj_id, secret):
 
     return secretResponse.payload.data.decode("UTF-8")
 
+def delete_secret(secretClient, project_id, secret_id):
+    """
+    Delete the secret with the given name and all of its versions.
+    """
+    client = secretClient
+
+    # Build the resource name of the secret.
+    name = client.secret_path(project_id, secret_id)
+
+    # Delete the secret.
+    client.delete_secret(request={"name": name})
 
 # Miramos la validez del token en caché
 # Podría cargar de la DB aquí mismo, pero supondría una pérdida de rendimiento en la primera carga de la página. Dejamos para el procedimiento de Logon
@@ -214,6 +225,7 @@ def autenticar():
         secretClient = secretmanager.SecretManagerServiceClient()
         try:
             redirect_url = get_secret(client=secretClient,proj_id=aux_limpieza.get_project_id(),secret="last_redirect_url")
+            delete_secret(secretClient,aux_limpieza.get_project_id(),secret_id="last_redirect_url")
             generar_tokens_oauth(redirect_url)
             flush_oauth_record(my_user_id=TW_USER_ID)
         except Exception as exc:
@@ -259,7 +271,7 @@ def redirect():
 
     set_secret(client=secretClient,proj_id=project_id,secret_id="last_redirect_url",payload=redirect_url)
 
-    return "Autorizado con URL {}".format(request.url)
+    return "Autorizado. Vuelve a la pantalla anterior para completar el proceso"
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
