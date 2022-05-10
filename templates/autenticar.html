@@ -4,9 +4,9 @@
 {% endblock%}
 
 {% block body %}
-    <h1>Copia la siguiente URL en otra ventanta del navegador para dar permiso a la aplicación</h1>
+    <h1>Abre la siguiente URL en otra ventanta del navegador para dar permiso a la aplicación</h1>
     <div class="oauth_url">
-        {{ auth_url }}
+        <a href={{ auth_url }}>Autenticar en Twitter</a>
     </div>
     <form action="/autenticar" method="post">
         <input type="text" autocomplete="off" autofocus name="url">
