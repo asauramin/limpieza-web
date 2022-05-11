@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block head %}
+    <title>redirigiendo</title>
+{% endblock%}
+
+{% block body %}
+    <h1>Autenticación reseteada</h1>
+    <h2>Te intento redirigir a la pantalla principal, figura.</h2>
+    <h2>Pero pulsa <a href="/">aquí</a> si ves que esto no se mueve después de:</h2>
+    <h3><span class="secundero">5</span> segundos</h3>
+    <script>
+
+            function sleep(ms){
+                return new Promise(resolve => setTimeout(resolve,ms));
+            }
+            async function lio(){
+                for (let i = 0; i < 5; i++) {
+                    let secondsText = document.querySelector('.secundero');
+                    let remaining = 5 - i;
+                    secondsText.innerHTML = remaining;
+                    await sleep(1000);
+                }
+                window.location.href = "/";
+            }
+            lio();
+    </script>
+{% endblock%}

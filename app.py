@@ -123,7 +123,7 @@ def valid_token_db(my_user_id):
 
     db_timestamp = None
     access = None
-    if "token_timestamp" in local_oauth_record:
+    if "token_timestamp" in local_oauth_record and local_oauth_record["token_timestamp"]!="":
         temp_timestamp = local_oauth_record["token_timestamp"]
         db_timestamp = datetime(temp_timestamp.year, temp_timestamp.month, temp_timestamp.day, temp_timestamp.hour+2, temp_timestamp.minute, temp_timestamp.second, tzinfo=timezone(timedelta(hours=2)))
         dt_now = datetime.now()
@@ -274,5 +274,25 @@ def redirect():
 
     return "Autorizado. Vuelve a la pantalla anterior para completar el proceso"
 
+@app.route("/resetear")
+def resetear():
+    global oauth_record
+
+    oauth_record={}
+    project_id = aux_limpieza.get_project_id()
+    try:
+        delete_secret(secretmanager.SecretManagerServiceClient(), project_id, "access")
+    except Exception as exc:
+        # Puede suceder una excepción si el secreto no existía, la registramos y seguimos sin hacer nada
+        print(exc)
+
+    db = firestore.Client(project_id)
+    doc_ref = db.collection("oauth").document(TW_USER_ID)
+    doc_ref.update({"token_timestamp" : ""})
+
+    return render_template("resetear.html",autenticado=False)
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+
+
