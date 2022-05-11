@@ -43,6 +43,7 @@ def set_secret(client, proj_id, secret_id, payload):
                 "secret": {"replication": {"user_managed": {"replicas": [{"location": "europe-west1"}]}}},
             }
         )
+        parent = client.secret_path(proj_id, secret_id)
         #Y ahora sí, lo actualizo
         client.add_secret_version(
             request={
