@@ -237,8 +237,13 @@ def autenticar():
 
 @app.route("/comenzar", methods=["POST"])
 def comenzar():
-    eliminados = limpieza()
-    return render_template("limpieza_exito.html", eliminados=eliminados, autenticado=valid_token_cache())
+    try:
+        eliminados = limpieza()
+    except aux_limpieza.LostTwitterAuth:
+        reset_status_auth()
+        return render_template("hubo_algun_problema.html", autenticado=False)
+    else:
+        return render_template("limpieza_exito.html", eliminados=eliminados, autenticado=valid_token_cache())
 
 def limpieza():
     my_user_id = TW_USER_ID
@@ -276,6 +281,10 @@ def redirect():
 
 @app.route("/resetear")
 def resetear():
+    reset_status_auth()
+    return render_template("resetear.html",autenticado=False)
+
+def reset_status_auth():
     global oauth_record
 
     oauth_record={}
@@ -289,8 +298,6 @@ def resetear():
     db = firestore.Client(project_id)
     doc_ref = db.collection("oauth").document(TW_USER_ID)
     doc_ref.update({"token_timestamp" : ""})
-
-    return render_template("resetear.html",autenticado=False)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

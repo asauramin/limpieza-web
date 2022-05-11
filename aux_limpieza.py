@@ -4,6 +4,7 @@ import urllib
 import os
 import json
 
+class LostTwitterAuth(Exception): pass
 
 def get_project_id():
     
@@ -40,9 +41,8 @@ def unfollow(user_id, target_user_id, access_token):
     }
     response = requests.request("DELETE", url, headers=headers, json={})
     if response.status_code != 200:
-        raise Exception(
-            "Request returned an error: {} {}".format(response.status_code, response.text)
-        )
+        print("{} {}".format(response.status_code, response.text))
+        raise LostTwitterAuth
 
 def get_contacts(user_id, api, bearer_token):
     global global_bearer_token
@@ -73,11 +73,9 @@ def get_contacts(user_id, api, bearer_token):
             if "next_token" in response_metadata:
                 next_page = response.json()["meta"]["next_token"]
     if response.status_code != 200:
-        raise Exception(
-            "Request returned an error: {} {}".format(
-                response.status_code, response.text
-            )
-        )
+        print("{} {}".format(response.status_code, response.text))
+        raise LostTwitterAuth
+
     return contacts
 
 def bearer_oauth(r):
