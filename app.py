@@ -292,7 +292,8 @@ def reset_status_auth():
     try:
         delete_secret(secretmanager.SecretManagerServiceClient(), project_id, "access")
     except Exception as exc:
-        # Puede suceder una excepción si el secreto no existía, la registramos y seguimos sin hacer nada
+        # Puede suceder una excepción si el secreto no existía,
+        # la registramos y seguimos sin hacer nada 
         print(exc)
 
     db = firestore.Client(project_id)
