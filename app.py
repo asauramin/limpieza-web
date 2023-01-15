@@ -14,7 +14,6 @@ import aux_limpieza
 
 app = Flask(__name__)
 
-# Retaking development on Jan 15 2023
 # Diccionario de variables de estado de la autenticación, ya refrescaremos de la DB si es necesario
 oauth_record={}
 
