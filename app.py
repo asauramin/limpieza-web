@@ -252,7 +252,7 @@ def limpieza():
 
     followers = aux_limpieza.get_contacts(user_id=my_user_id, api="followers", bearer_token=oauth_record["bearer_token"])
 
-    followees = aux_limpieza.get_contacts(user_id=my_user_id, api="following", bearer_token=oauth_record["bearer_token"])
+    followees = list(reversed(aux_limpieza.get_contacts(user_id=my_user_id, api="following", bearer_token=oauth_record["bearer_token"])))
 
     # Cross check both lists to find who I follow, who doesn't follow me back
     rate_limit = 50
